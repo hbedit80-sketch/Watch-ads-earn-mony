@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Categories</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            margin: 0; 
+            background: #f4f7f6; 
+            font-family: 'Poppins', sans-serif; 
+            padding-bottom: 80px; 
+        }
+
+        .category-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            padding: 15px; 
+        }
+
+        .cat-box { 
+            padding: 20px 10px; 
+            text-align: center; 
+            border-radius: 15px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            min-height: 80px;
+        }
+
+        .cat-box:active { transform: scale(0.92); }
+
+        .cat-1 { background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); }
+        .cat-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .cat-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .cat-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+        #post-container { 
+            display: none; 
+            padding: 15px; 
+            background: white;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            margin-top: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            padding-left: 10px;
+            border-left: 5px solid #2575fc;
+        }
+
+        .post-card { 
+            background: white; 
+            margin-bottom: 20px; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08); 
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+
+        .image-container { position: relative; width: 100%; height: 180px; background: #eee; }
+        .post-card img { width: 100%; height: 100%; object-fit: cover; }
+        .img-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+        }
+
+        .post-card h4 { padding: 15px; margin: 0; color: #2c3e50; font-size: 16px; }
+        .post-meta { padding: 0 15px 15px; font-size: 12px; color: #888; display: flex; justify-content: space-between; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: white; display: flex;
+            justify-content: space-around; padding: 10px 0;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            z-index: 1000;
+        }
+
+        .nav-item { text-align: center; color: #888; cursor: pointer; flex: 1; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        .nav-item span { font-size: 11px; font-weight: bold; }
+        .nav-item.active { color: #2575fc; }
+
+        #loader { text-align: center; padding: 20px; color: #666; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="category-grid">
+    <div class="cat-box cat-1" onclick="fetchCategoryPosts('world history', 'विश्व इतिहास')">विश्व इतिहास</div>
+    <div class="cat-box cat-2" onclick="fetchCategoryPosts('ramayan', 'रामायण')">रामायण</div>
+    <div class="cat-box cat-3" onclick="fetchCategoryPosts('mahabharat', 'महाभारत')">महाभारत</div>
+    <div class="cat-box cat-4" onclick="fetchCategoryPosts('film_history', 'फिल्म ईतिहास')">फिल्म ईतिहास</div>
+</div>
+
+<div id="loader"><i class="fa fa-spinner fa-spin"></i> जानकारी खोज्दै...</div>
+
+<div id="post-container">
+    <div class="section-title" id="cat-title">ताजा जानकारी</div>
+    <div id="post-list"></div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item" onclick="location.href='index.html'"><i class="fa fa-home"></i><span>Home</span></div>
+    <div class="nav-item active" onclick="location.href='history_content.html'"><i class="fa fa-history"></i><span>History</span></div>
+    <div class="nav-item" onclick="location.href='profile.html'"><i class="fa fa-user"></i><span>Profile</span></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+    // १. Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
+        authDomain: "watch-vidwo.firebaseapp.com",
+        projectId: "watch-vidwo",
+        storageBucket: "watch-vidwo.firebasestorage.app",
+        messagingSenderId: "241433573771",
+        appId: "1:241433573771:web:2dce688d35f4cef910578e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // २. Firebase बाट क्याटेगोरी अनुसार पोस्ट तान्ने
+    function fetchCategoryPosts(slug, displayName) {
+        const list = document.getElementById('post-list');
+        const loader = document.getElementById('loader');
+        const container = document.getElementById('post-container');
+
+        loader.style.display = 'block';
+        container.style.display = 'none';
+        list.innerHTML = "";
+        document.getElementById('cat-title').innerText = displayName + " विशेष";
+
+        // Firebase मा खोज्ने (on('value') प्रयोग गर्दा नयाँ पोस्ट आफै थपिन्छ)
+        db.ref('history_content/' + slug).on('value', (snapshot) => {
+            loader.style.display = 'none';
+            container.style.display = 'block';
+            
+            const data = snapshot.val();
+            list.innerHTML = ""; // पुरानो लिस्ट सफा गर्ने
+
+            if(!data) {
+                list.innerHTML = "<p style='text-align:center; padding:20px;'>यस क्याटेगोरीमा अहिले कुनै पोस्ट छैन।</p>";
+                return;
+            }
+
+            Object.keys(data).forEach(key => {
+                const post = data[key];
+                // यहाँ encodeURIComponent थपिएको छ
+                const card = `
+                    <div class="post-card" onclick="viewFullPost('${encodeURIComponent(slug)}', '${key}')">
+                        <div class="image-container">
+                            <img src="${post.image || 'https://via.placeholder.com/500x250'}" alt="thumbnail">
+                            <div class="img-overlay"></div>
+                        </div>
+                        <h4>${post.title}</h4>
+                        <div class="post-meta">
+                            <span><i class="fa fa-clock"></i> ${post.time || 'भर्खरै'}</span>
+                            <span style="color: #2575fc;">थप पढ्नुस्...</span>
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += card;
+            });
+
+            // हल्का स्क्रोल गर्ने
+            window.scrollTo({ top: container.offsetTop - 20, behavior: 'smooth' });
+        });
+    }
+
+    // ३. पोस्टको पूरा विवरण हेर्न पठाउने
+    function viewFullPost(type, postId) {
+        location.href = `content.html?type=${type}&id=${postId}`;
+    }
+</script>
+
+</body>
+</html>

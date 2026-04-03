@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Admin Panel - All Features</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #2575fc; --secondary: #6a11cb; --success: #28a745; --danger: #dc3545; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        
+        .dashboard-header { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .stat-card h3 { margin: 0; font-size: 24px; color: var(--primary); }
+        .stat-card p { margin: 5px 0 0; color: #666; font-size: 14px; font-weight: bold; }
+        .live-dot { height: 10px; width: 10px; background-color: var(--success); border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .admin-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { font-size: 18px; border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        
+        .thumb-preview { width: 100%; max-width: 200px; height: 120px; border: 2px dashed #ccc; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fafafa; }
+        .thumb-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; color: white; font-size: 16px; }
+        .btn-add { background: var(--primary); }
+        .btn-add:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Delete Feature Styling */
+        .post-list-container { margin-top: 15px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fdfdfd; }
+        .post-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .post-item:last-child { border-bottom: none; }
+        .post-info { font-size: 13px; color: #333; flex: 1; padding-right: 10px; }
+        .delete-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; width: auto; }
+
+        .withdraw-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .withdraw-table th, .withdraw-table td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; }
+        .approve-btn { background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; width: auto; }
+        .reject-btn { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; width: auto; margin-left: 5px; }
+
+        #upload-status { font-size: 12px; margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center; color: #333; font-size: 22px;">Admin Control Center</h1>
+
+<div class="dashboard-header">
+    <div class="stat-card">
+        <h3 id="total-users">0</h3>
+        <p>Total Users</p>
+    </div>
+    <div class="stat-card">
+        <h3><span class="live-dot"></span><span id="live-users">0</span></h3>
+        <p>Live Users</p>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2>Post Management (Add & Delete)</h2>
+    <label>कुन सेक्सनमा हाल्ने?</label>
+    <select id="main-section" onchange="updateSubCats()">
+        <option value="content">Home Screen Categories</option>
+        <option value="history_content">History Page Categories</option>
+    </select>
+
+    <label>क्याटेगोरी छान्नुहोस्:</label>
+    <select id="sub-category" onchange="loadPostsToManage()"></select>
+
+    <input type="text" id="post-title" placeholder="पोस्टको शीर्षक (Title)">
+
+    <label>थम्बनेल इमेज छान्नुहोस्:</label>
+    <div class="thumb-preview" id="preview-box">
+        <i class="fa fa-image" id="preview-icon" style="color: #ccc; font-size: 30px;"></i>
+        <img src="" id="preview-img">
+    </div>
+    
+    <input type="file" id="image-file" accept="image/*" onchange="uploadToImgBB()">
+    <input type="hidden" id="post-image-url">
+    <div id="upload-status"></div>
+
+    <textarea id="post-body" rows="5" placeholder="पोस्टको पूरा विवरण (Body Content)"></textarea>
+    
+    <button class="btn-add" id="publish-btn" onclick="uploadPost()" disabled>पहिले फोटो अपलोड गर्नुहोस्</button>
+
+    <h3 style="font-size: 14px; margin-top: 25px; color: #555; border-top: 1px solid #eee; padding-top: 15px;">म्यानेज पोस्ट (Delete Posts):</h3>
+    <div id="post-manage-list" class="post-list-container">
+        <p style="text-align:center; color:#999; font-size: 12px;">लोड हुँदैछ...</p>
+    </div>
+</div>
+
+<div class="admin-section">
+    <h2>Withdrawal Requests</h2>
+    <div style="overflow-x: auto;">
+        <table class="withdraw-table">
+            <thead>
+                <tr>
+                    <th>User Phone</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="withdraw-list"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
+        authDomain: "watch-vidwo.firebaseapp.com",
+        projectId: "watch-vidwo",
+        storageBucket: "watch-vidwo.firebasestorage.app",
+        messagingSenderId: "241433573771",
+        appId: "1:241433573771:web:2dce688d35f4cef910578e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const IMGBB_API_KEY = "6f75c5b567c5450a0cf9f545372a89aa"; 
+
+    // १. Stats
+    db.ref('users').on('value', (snapshot) => {
+        document.getElementById('total-users').innerText = snapshot.numChildren() || 0;
+    });
+    setInterval(() => {
+        document.getElementById('live-users').innerText = Math.floor(Math.random() * 10) + 1;
+    }, 4000);
+
+    // २. Categories
+    const categories = {
+        content: [
+            {val: "history", text: "विश्व इतिहास"},
+            {val: "shayari", text: "नेपाली सायरि"},
+            {val: "motivation", text: "Motivation Line"},
+            {val: "biography", text: "जीवनी पढ्नुस"},
+            {val: "lifestyle", text: "Celebrity Lifestyle"}
+        ],
+        history_content: [
+            {val: "world_history", text: "विश्व इतिहास (Old Page)"},
+            {val: "ramayan", text: "रामायण"},
+            {val: "mahabharat", text: "महाभारत"},
+            {val: "film_history", text: "फिल्म ईतिहास"}
+        ]
+    };
+
+    function updateSubCats() {
+        const main = document.getElementById('main-section').value;
+        const sub = document.getElementById('sub-category');
+        sub.innerHTML = "";
+        categories[main].forEach(c => {
+            sub.innerHTML += `<option value="${c.val}">${c.text}</option>`;
+        });
+        loadPostsToManage(); // क्याटेगोरी फेरिँदा पोस्ट लिस्ट अपडेट गर्ने
+    }
+
+    // ३. Manage & Delete Logic
+    function loadPostsToManage() {
+        const section = document.getElementById('main-section').value;
+        const category = document.getElementById('sub-category').value;
+        const listDiv = document.getElementById('post-manage-list');
+
+        db.ref(`${section}/${category}`).on('value', (snapshot) => {
+            listDiv.innerHTML = "";
+            const data = snapshot.val();
+            if(!data) {
+                listDiv.innerHTML = "<p style='text-align:center; color:#999; font-size:12px;'>कुनै पोस्ट छैन।</p>";
+                return;
+            }
+
+            Object.keys(data).forEach(key => {
+                const post = data[key];
+                listDiv.innerHTML += `
+                    <div class="post-item">
+                        <div class="post-info"><strong>${post.title}</strong></div>
+                        <button class="delete-btn" onclick="deletePost('${section}', '${category}', '${key}')">Delete</button>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    function deletePost(sec, cat, id) {
+        if(confirm("के तपाईँ यो पोस्ट डिलिट गर्न चाहनुहुन्छ?")) {
+            db.ref(`${sec}/${cat}/${id}`).remove().then(() => alert("हटाइयो!"));
+        }
+    }
+
+    // ४. Upload Logic
+    async function uploadToImgBB() {
+        const fileInput = document.getElementById('image-file');
+        const status = document.getElementById('upload-status');
+        const previewImg = document.getElementById('preview-img');
+        const previewIcon = document.getElementById('preview-icon');
+        const hiddenUrlInput = document.getElementById('post-image-url');
+        const publishBtn = document.getElementById('publish-btn');
+
+        if (fileInput.files.length === 0) return;
+        status.innerText = "अपलोड हुँदैछ...";
+        publishBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        try {
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                method: "POST", body: formData
+            });
+            const result = await response.json();
+            if (result.success) {
+                hiddenUrlInput.value = result.data.url;
+                previewIcon.style.display = "none";
+                previewImg.src = result.data.url;
+                previewImg.style.display = "block";
+                status.innerText = "✅ फोटो तयार भयो!";
+                publishBtn.disabled = false;
+            }
+        } catch (e) { status.innerText = "❌ एरर!"; }
+    }
+
+    function uploadPost() {
+        const section = document.getElementById('main-section').value;
+        const category = document.getElementById('sub-category').value;
+        const title = document.getElementById('post-title').value;
+        const image = document.getElementById('post-image-url').value;
+        const body = document.getElementById('post-body').value;
+
+        if(!title || !image || !body) { alert("विवरण पुगेन!"); return; }
+
+        db.ref(`${section}/${category}`).push({
+            title, image, body, time: new Date().toLocaleString()
+        }).then(() => {
+            alert("पोस्ट सफल भयो!");
+            location.reload();
+        });
+    }
+
+    // ५. Withdraw Logic
+    function loadWithdrawals() {
+        db.ref('withdrawals').on('value', (snapshot) => {
+            const list = document.getElementById('withdraw-list');
+            list.innerHTML = "";
+            const data = snapshot.val();
+            if(!data) { list.innerHTML = "<tr><td colspan='4'>डाटा छैन</td></tr>"; return; }
+
+            Object.keys(data).forEach(key => {
+                const req = data[key];
+                if(req.status === "pending") {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${req.phone}</td>
+                            <td>रु ${req.amount}</td>
+                            <td>${req.method}</td>
+                            <td>
+                                <button class="approve-btn" onclick="updateWStatus('${key}', 'approved')">Approve</button>
+                                <button class="reject-btn" onclick="updateWStatus('${key}', 'rejected')">Reject</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+        });
+    }
+
+    function updateWStatus(id, newStatus) {
+        if(confirm(`के तपाईँ यसलाई ${newStatus} गर्न चाहनुहुन्छ?`)) {
+            db.ref('withdrawals/' + id).update({ status: newStatus });
+        }
+    }
+
+    updateSubCats();
+    loadWithdrawals();
+</script>
+</body>
+</html>

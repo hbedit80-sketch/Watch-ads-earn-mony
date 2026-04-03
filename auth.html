@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earn App - Login/Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #28a745; box-shadow: 0 0 5px rgba(40, 167, 69, 0.2); }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #218838; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        .toggle-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; font-size: 14px; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container" id="auth-box">
+        <div id="register-ui">
+            <h2>दर्ता गर्नुहोस्</h2>
+            <input type="text" id="reg-name" placeholder="पुरा नाम">
+            <input type="number" id="reg-phone" placeholder="फोन नम्बर">
+            <input type="password" id="reg-pass" placeholder="पासवर्ड">
+            <input type="text" id="reg-refer" placeholder="रेफरल कोड (छ भने)">
+            <button id="reg-btn" onclick="handleRegister()">Register</button>
+            <p class="toggle-link" onclick="showLogin()">खाता छ? लगइन गर्नुहोस्</p>
+        </div>
+
+        <div id="login-ui" style="display:none;">
+            <h2>लगइन गर्नुहोस्</h2>
+            <input type="number" id="log-phone" placeholder="फोन नम्बर">
+            <input type="password" id="log-pass" placeholder="पासवर्ड">
+            <button id="log-btn" onclick="handleLogin()">Login</button>
+            <p class="toggle-link" onclick="showRegister()">खाता छैन? दर्ता गर्नुहोस्</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script>
+        // १. Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
+            authDomain: "watch-vidwo.firebaseapp.com",
+            projectId: "watch-vidwo",
+            storageBucket: "watch-vidwo.firebasestorage.app",
+            messagingSenderId: "241433573771",
+            appId: "1:241433573771:web:2dce688d35f4cef910578e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // पेज लोड हुँदा लगइन चेक गर्ने
+        window.onload = function() {
+            if (localStorage.getItem("currentUser")) {
+                window.location.href = "index.html";
+            }
+        };
+
+        function showLogin() {
+            document.getElementById('register-ui').style.display = 'none';
+            document.getElementById('login-ui').style.display = 'block';
+        }
+
+        function showRegister() {
+            document.getElementById('register-ui').style.display = 'block';
+            document.getElementById('login-ui').style.display = 'none';
+        }
+
+        // २. Firebase मा दर्ता (Register) गर्ने फङ्सन
+        function handleRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            const refer = document.getElementById('reg-refer').value.trim();
+
+            if (!name || !phone || !pass) {
+                alert("कृपया सबै अनिवार्य जानकारी भर्नुहोस्!");
+                return;
+            }
+
+            const btn = document.getElementById('reg-btn');
+            btn.innerText = "प्रक्रिया हुँदैछ...";
+            btn.disabled = true;
+
+            // पहिले यो फोन नम्बर डाटाबेसमा छ कि छैन चेक गर्ने
+            db.ref('users/' + phone).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    alert("यो फोन नम्बर पहिले नै दर्ता छ!");
+                    btn.innerText = "Register";
+                    btn.disabled = false;
+                } else {
+                    // नयाँ युजर डाटा तयार पार्ने
+                    const newUser = {
+                        name: name,
+                        phone: phone,
+                        pass: pass,
+                        referBalance: 10.00, // साइन-अप बोनस रु १०
+                        totalRefer: 0,
+                        myReferCode: phone.slice(-4) + Math.floor(10 + Math.random() * 90)
+                    };
+
+                    // Firebase मा सेभ गर्ने
+                    db.ref('users/' + phone).set(newUser).then(() => {
+                        alert("दर्ता सफल! अब लगइन गर्नुहोस्।");
+                        showLogin();
+                    }).catch(err => {
+                        alert("त्रुटि: " + err.message);
+                    }).finally(() => {
+                        btn.innerText = "Register";
+                        btn.disabled = false;
+                    });
+                }
+            });
+        }
+
+        // ३. Firebase बाट लगइन (Login) गर्ने फङ्सन
+        function handleLogin() {
+            const phone = document.getElementById('log-phone').value.trim();
+            const pass = document.getElementById('log-pass').value.trim();
+
+            if (!phone || !pass) {
+                alert("फोन र पासवर्ड हाल्नुहोस्!");
+                return;
+            }
+
+            const btn = document.getElementById('log-btn');
+            btn.innerText = "लगइन हुँदैछ...";
+            btn.disabled = true;
+
+            db.ref('users/' + phone).once('value', (snapshot) => {
+                const user = snapshot.val();
+                if (user && user.pass === pass) {
+                    localStorage.setItem("currentUser", phone);
+                    alert("लगइन सफल!");
+                    window.location.href = "index.html"; 
+                } else {
+                    alert("नम्बर वा पासवर्ड गलत छ!");
+                    btn.innerText = "Login";
+                    btn.disabled = false;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
