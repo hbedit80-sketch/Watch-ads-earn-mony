@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile - Earn App</title>
+    <title>User Profile - Daily Paisa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { 
@@ -24,7 +24,6 @@
         .user-info { margin-top: 10px; }
         .user-name { font-size: 22px; font-weight: bold; color: #333; margin: 0; }
         
-        /* रेफरल बक्स स्टाइल */
         .refer-stats-container {
             display: flex;
             justify-content: space-around;
@@ -49,7 +48,6 @@
         .menu-item i { width: 35px; font-size: 18px; color: #2575fc; }
         .share-btn { background: #2575fc; color: white; justify-content: center; margin-top: 10px; }
         
-        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal-content { background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; }
         .payment-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
@@ -114,7 +112,7 @@
 
     <div class="menu-list">
         <div class="menu-item" onclick="openModal('editNameModal')"><i class="fa fa-user-edit"></i> Edit Profile</div>
-        <div class="menu-item" onclick="openModal('historyModal')"><i class="fa fa-history"></i> Withdraw History</div>
+        <div class="menu-item" onclick="openModal('historyModal')"><i class="fa fa-history"></i> Local History</div>
         <div class="menu-item" style="color: #eb3349;" onclick="handleLogout()">
             <i class="fa fa-sign-out-alt" style="color: #eb3349;"></i> Logout
         </div>
@@ -124,7 +122,7 @@
 
 <div class="bottom-nav">
     <div class="nav-item" onclick="location.href='index.html'"><i class="fa fa-home"></i><span>Home</span></div>
-    <div class="nav-item" onclick="location.href='old.html'"><i class="fa fa-history"></i><span>History</span></div>
+    <div class="nav-item" onclick="location.href='history_content.html'"><i class="fa fa-history"></i><span>History</span></div>
     <div class="nav-item active" onclick="location.href='profile.html'"><i class="fa fa-user"></i><span>Profile</span></div>
 </div>
 
@@ -169,7 +167,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <script>
-    // १. Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
         authDomain: "watch-vidwo.firebaseapp.com",
@@ -179,20 +176,16 @@
         appId: "1:241433573771:web:2dce688d35f4cef910578e"
     };
 
-    // Firebase Initialize
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const currentUserPhone = localStorage.getItem("currentUser");
 
-    // २. पेज लोड हुँदा Firebase बाट डाटा तान्ने
     window.onload = function() {
         if(!currentUserPhone) {
             window.location.href = "auth.html";
             return;
         }
         
-        // Firebase बाट User Data तान्ने
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
             const user = snapshot.val();
             if(user) {
@@ -200,34 +193,29 @@
                 document.getElementById('user-ref').innerText = user.myReferCode || "----";
                 document.getElementById('total-refer').innerText = user.totalRefer || "0";
                 document.getElementById('refer-bal').innerText = (user.referBalance || 0).toFixed(2);
-            } else {
-                console.log("User not found in Firebase");
             }
         });
     };
 
-    // ३. नाम परिवर्तन गर्ने (Firebase मा अपडेट हुने)
     function saveName() {
         const newName = document.getElementById('newNameInput').value.trim();
         if(newName !== "") {
-            db.ref('users/' + currentUserPhone).update({
-                name: newName
-            }).then(() => {
-                alert("नाम परिवर्तन भयो!");
-                closeModal('editNameModal');
-            }).catch(err => alert("Error: " + err.message));
+            db.ref('users/' + currentUserPhone).update({ name: newName })
+            .then(() => { alert("नाम परिवर्तन भयो!"); closeModal('editNameModal'); });
         }
     }
 
-    // ४. निकासी अनुरोध (Firebase मा सेभ हुने)
+    let selectedMethodName = "";
+    function selectMethod(name, element) {
+        selectedMethodName = name;
+        document.querySelectorAll('.method-box').forEach(box => box.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
     function submitWithdraw() {
         const amt = document.getElementById('withdrawAmt').value;
         const id = document.getElementById('withdrawID').value;
-        
-        if (!selectedMethodName || amt < 50 || !id) {
-            alert("सही विवरण भर्नुहोस् (न्यूनतम रु ५०)!");
-            return;
-        }
+        if (!selectedMethodName || amt < 50 || !id) { alert("सही विवरण भर्नुहोस्!"); return; }
         
         const withdrawData = {
             date: new Date().toLocaleDateString(),
@@ -237,69 +225,39 @@
             status: "Pending"
         };
 
-        // Firebase मा 'withdrawals' भित्र सेभ गर्ने
         db.ref('withdrawals/' + currentUserPhone).push(withdrawData)
-        .then(() => {
-            alert("निकासी अनुरोध सफल भयो!");
-            closeModal('withdrawModal');
-        }).catch(err => alert("Error: " + err.message));
+        .then(() => { alert("अनुरोध सफल भयो!"); closeModal('withdrawModal'); });
     }
 
-    // ५. निकासी इतिहास तान्ने
     function loadHistory() {
         const body = document.getElementById('historyBody');
         body.innerHTML = "loading...";
-
         db.ref('withdrawals/' + currentUserPhone).once('value', (snapshot) => {
             body.innerHTML = "";
             const data = snapshot.val();
-            if(!data) {
-                body.innerHTML = "<tr><td colspan='3' style='text-align:center;'>रेकर्ड छैन।</td></tr>";
-                return;
-            }
-            
-            // डेटालाई उल्टाएर देखाउने (नयाँ माथि)
-            const keys = Object.keys(data).reverse();
-            keys.forEach(key => {
+            if(!data) { body.innerHTML = "<tr><td colspan='3'>रेकर्ड छैन।</td></tr>"; return; }
+            Object.keys(data).reverse().forEach(key => {
                 const item = data[key];
-                body.innerHTML += `<tr>
-                    <td>${item.date}</td>
-                    <td>रु.${item.amount}</td>
-                    <td style="color:${item.status === 'Pending' ? 'orange' : 'green'};">${item.status}</td>
-                </tr>`;
+                body.innerHTML += `<tr><td>${item.date}</td><td>रु.${item.amount}</td><td style="color:${item.status === 'Pending' ? 'orange' : 'green'};">${item.status}</td></tr>`;
             });
         });
     }
 
-    // बाँकी साना फङ्सनहरू
-    let selectedMethodName = "";
-    function selectMethod(name, element) {
-        selectedMethodName = name;
-        document.querySelectorAll('.method-box').forEach(box => box.classList.remove('selected'));
-        element.classList.add('selected');
-    }
-
     function handleLogout() {
-        if(confirm("के तपाईँ बाहिरिन चाहनुहुन्छ?")) {
-            localStorage.removeItem("currentUser");
-            window.location.href = "auth.html";
-        }
+        if(confirm("बाहिरिन चाहनुहुन्छ?")) { localStorage.removeItem("currentUser"); window.location.href = "auth.html"; }
     }
 
     function shareApp() {
         const refCode = document.getElementById('user-ref').innerText;
-        const shareText = `यो एपबाट पैसा कमाउनुहोस्! रेफर कोड: ${refCode}`;
-        if (navigator.share) {
-            navigator.share({ title: 'Earn App', text: shareText, url: window.location.origin });
-        } else {
-            window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-        }
+        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र पैसा कमाउनुहोस्! मेरो रेफर कोड: ${refCode}`;
+        if (navigator.share) { navigator.share({ title: 'Daily Paisa', text: shareText, url: window.location.origin }); }
+        else { window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank'); }
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'historyModal') loadHistory(); }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     
-    document.getElementById('img-upload').onchange = function(evt) {
+    document.getElementById('img-upload').onchange = function() {
         const [file] = this.files;
         if (file) { document.getElementById('profile-pic').src = URL.createObjectURL(file); }
     };
