@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earn App - Login/Register</title>
+    <title>Daily Paisa - Login/Register</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
@@ -42,10 +42,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <script>
-        // १. Firebase Configuration
+        // १. Firebase Configuration (databaseURL थपिएको छ)
         const firebaseConfig = {
             apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
             authDomain: "watch-vidwo.firebaseapp.com",
+            databaseURL: "https://watch-vidwo-default-rtdb.firebaseio.com",
             projectId: "watch-vidwo",
             storageBucket: "watch-vidwo.firebasestorage.app",
             messagingSenderId: "241433573771",
@@ -55,7 +56,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // पेज लोड हुँदा लगइन चेक गर्ने
         window.onload = function() {
             if (localStorage.getItem("currentUser")) {
                 window.location.href = "index.html";
@@ -72,15 +72,15 @@
             document.getElementById('login-ui').style.display = 'none';
         }
 
-        // २. Firebase मा दर्ता (Register) गर्ने फङ्सन
+        // २. Register Function
         function handleRegister() {
             const name = document.getElementById('reg-name').value.trim();
             const phone = document.getElementById('reg-phone').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
-            const refer = document.getElementById('reg-refer').value.trim();
+            const referInput = document.getElementById('reg-refer').value.trim();
 
             if (!name || !phone || !pass) {
-                alert("कृपया सबै अनिवार्य जानकारी भर्नुहोस्!");
+                alert("कृपया सबै जानकारी भर्नुहोस्!");
                 return;
             }
 
@@ -88,30 +88,32 @@
             btn.innerText = "प्रक्रिया हुँदैछ...";
             btn.disabled = true;
 
-            // पहिले यो फोन नम्बर डाटाबेसमा छ कि छैन चेक गर्ने
             db.ref('users/' + phone).once('value', (snapshot) => {
                 if (snapshot.exists()) {
-                    alert("यो फोन नम्बर पहिले नै दर्ता छ!");
+                    alert("यो नम्बर पहिले नै दर्ता छ!");
                     btn.innerText = "Register";
                     btn.disabled = false;
                 } else {
-                    // नयाँ युजर डाटा तयार पार्ने
+                    // नयाँ युजर डाटा
                     const newUser = {
                         name: name,
                         phone: phone,
                         pass: pass,
-                        referBalance: 10.00, // साइन-अप बोनस रु १०
+                        referBalance: 10.00, // नयाँलाई रु १० बोनस
                         totalRefer: 0,
-                        myReferCode: phone.slice(-4) + Math.floor(10 + Math.random() * 90)
+                        myReferCode: "DP" + phone.slice(-4) // "DP" + लास्ट ४ अंक
                     };
 
-                    // Firebase मा सेभ गर्ने
+                    // यदि कसैको रेफरल कोड हालेको छ भने उसलाई पैसा दिने
+                    if (referInput !== "") {
+                        checkAndRewardReferrer(referInput);
+                    }
+
                     db.ref('users/' + phone).set(newUser).then(() => {
                         alert("दर्ता सफल! अब लगइन गर्नुहोस्।");
                         showLogin();
-                    }).catch(err => {
-                        alert("त्रुटि: " + err.message);
-                    }).finally(() => {
+                    }).catch(err => alert(err.message))
+                    .finally(() => {
                         btn.innerText = "Register";
                         btn.disabled = false;
                     });
@@ -119,7 +121,25 @@
             });
         }
 
-        // ३. Firebase बाट लगइन (Login) गर्ने फङ्सन
+        // ३. रेफरल कोड चेक गर्ने र पैसा थप्ने लोजिक
+        function checkAndRewardReferrer(code) {
+            db.ref('users').orderByChild('myReferCode').equalTo(code).once('value', (snap) => {
+                if (snap.exists()) {
+                    snap.forEach((child) => {
+                        const referrerPhone = child.key;
+                        const currentData = child.val();
+                        
+                        // रिफर गर्ने मान्छेलाई रु ३ थप्ने र टोटल रिफर बढाउने
+                        db.ref('users/' + referrerPhone).update({
+                            referBalance: (parseFloat(currentData.referBalance) || 0) + 3.00,
+                            totalRefer: (parseInt(currentData.totalRefer) || 0) + 1
+                        });
+                    });
+                }
+            });
+        }
+
+        // ४. Login Function
         function handleLogin() {
             const phone = document.getElementById('log-phone').value.trim();
             const pass = document.getElementById('log-pass').value.trim();
@@ -136,7 +156,7 @@
             db.ref('users/' + phone).once('value', (snapshot) => {
                 const user = snapshot.val();
                 if (user && user.pass === pass) {
-                    localStorage.setItem("currentUser", phone);
+                    localStorage.setItem("currentUser", phone); // यो लाइन अनिवार्य छ
                     alert("लगइन सफल!");
                     window.location.href = "index.html"; 
                 } else {
