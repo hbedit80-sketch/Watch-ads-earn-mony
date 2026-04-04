@@ -8,7 +8,6 @@
     <style>
         body { margin: 0; background: #f8f9fa; font-family: 'Poppins', sans-serif; padding-bottom: 90px; }
         
-        /* Header Section */
         .header { 
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); 
             color: white; padding: 40px 20px 30px; text-align: center; 
@@ -21,7 +20,6 @@
             border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); 
         }
         
-        /* Customer Service */
         .service-title { text-align: center; font-size: 14px; font-weight: bold; margin: 20px 0 10px; color: #444; }
         .customer-service { 
             display: flex; justify-content: space-around; padding: 15px 10px; 
@@ -36,7 +34,6 @@
         .service-name { font-size: 10px; font-weight: 600; color: #555; }
         .ws { background: #25D366; } .tg { background: #0088cc; } .yt { background: #FF0000; } .fb { background: #1877F2; }
 
-        /* Grid Layout */
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px 20px; }
         .box { 
             padding: 25px 10px; text-align: center; border-radius: 20px; color: white; 
@@ -48,11 +45,10 @@
         .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); }
         .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
         .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
-        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); }
+        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); } 
         .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
         .bg-6 { background: linear-gradient(135deg, #eb3349, #f45c43); }
 
-        /* Bottom Navigation */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: white; 
             display: flex; justify-content: space-around; padding: 12px 0; 
@@ -102,7 +98,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <script>
-    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
         authDomain: "watch-vidwo.firebaseapp.com",
@@ -116,9 +111,7 @@
     const db = firebase.database();
     const currentUserPhone = localStorage.getItem("currentUser");
     let currentBalance = 0.00;
-    let waitingForReward = false;
 
-    // Load User Data
     window.onload = function() {
         if(!currentUserPhone) {
             window.location.href = "auth.html";
@@ -133,31 +126,18 @@
         });
     };
 
-    // विज्ञापन खोल्ने फङ्सन
     function watchAdsAndReward() {
-        const taskLink = "https://taskzone101.blogspot.com/2026/03/task-verification-10-var-timeleft-10.html";
-        window.open(taskLink, '_blank');
-        waitingForReward = true; 
-    }
-
-    // प्रयोगकर्ता एपमा फिर्ता आएपछि रिवार्ड दिने
-    window.onfocus = function() {
-        if (waitingForReward) {
-            addRewardToDatabase();
-            waitingForReward = false; 
-        }
-    };
-
-    function addRewardToDatabase() {
+        // स्वतः पैसा थप्ने लोजिक
         let reward = 0.05;
         let newBalance = currentBalance + reward;
 
         db.ref('users/' + currentUserPhone).update({
             referBalance: newBalance
         }).then(() => {
-            alert("विज्ञापन हेरेर फिर्ता आउनुभएकोमा धन्यवाद! रु ०.०५ थपियो।");
+            // सिधै ब्लगरको पेज खुल्ने (त्यही विन्डोमा)
+            location.href = "https://taskzone101.blogspot.com/2026/03/task-verification-10-var-timeleft-10.html";
         }).catch((e) => {
-            console.error("Update failed: ", e.message);
+            console.log("Database update failed:", e);
         });
     }
 
