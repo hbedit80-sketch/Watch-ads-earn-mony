@@ -54,7 +54,7 @@
             <button class="upload-btn" onclick="document.getElementById('img-upload').click()"><i class="fa fa-camera"></i></button>
         </div>
         <div class="user-info">
-            <p class="user-name" id="display-name">लोड हुँदैछ...</p>
+            <p class="user-name" id="display-name">Loading...</p>
             <div class="referral-badge"><i class="fa fa-gift"></i> Referral ID: <span id="user-ref">----</span></div>
         </div>
     </div>
@@ -144,7 +144,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const currentUserPhone = localStorage.getItem("currentUser");
-
     let userBalance = 0;
     let selectedMethodName = "";
 
@@ -154,26 +153,23 @@
             return;
         }
 
-        // Real-time Database बाट डाटा तान्ने
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
             const user = snapshot.val();
             if(user) {
                 document.getElementById('display-name').innerText = user.name || "प्रयोगकर्ता";
                 document.getElementById('user-ref').innerText = user.myReferCode || "----";
-                
                 userBalance = parseFloat(user.referBalance || 0);
                 document.getElementById('refer-bal').innerText = userBalance.toFixed(2);
-                
                 document.getElementById('total-refer').innerText = user.totalRefer || "0";
             }
         });
     };
 
-    // सेयर फङ्सन (App Link सहित)
+    // सेयर फङ्सन - तपाईँको लिङ्क यहाँ छ
     function shareApp() {
         const refCode = document.getElementById('user-ref').innerText;
         const appLink = "https://www.appcreator24.com/app3984422-labdpz";
-        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र घरमै बसी पैसा कमाउनुहोस्! 💸\n\nमेरो रिफर कोड: ${refCode}\nएप लिङ्क: ${appLink}`;
+        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र घरमै बसी पैसा कमाउनुहोस्! 💰\n\nमेरो रिफर कोड: ${refCode}\nएप डाउनलोड लिङ्क: ${appLink}`;
 
         if (navigator.share) {
             navigator.share({
@@ -211,10 +207,7 @@
         .then(() => {
             return db.ref('users/' + currentUserPhone).update({ referBalance: userBalance - amt });
         })
-        .then(() => { 
-            alert("निकासी अनुरोध पठाइयो!"); 
-            closeModal('withdrawModal'); 
-        });
+        .then(() => { alert("निकासी सफल भयो!"); closeModal('withdrawModal'); });
     }
 
     function loadHistory() {
