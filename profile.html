@@ -54,7 +54,7 @@
             <button class="upload-btn" onclick="document.getElementById('img-upload').click()"><i class="fa fa-camera"></i></button>
         </div>
         <div class="user-info">
-            <p class="user-name" id="display-name">Loading...</p>
+            <p class="user-name" id="display-name">लोड हुँदैछ...</p>
             <div class="referral-badge"><i class="fa fa-gift"></i> Referral ID: <span id="user-ref">----</span></div>
         </div>
     </div>
@@ -148,11 +148,7 @@
     let selectedMethodName = "";
 
     window.onload = function() {
-        if(!currentUserPhone) {
-            window.location.href = "auth.html";
-            return;
-        }
-
+        if(!currentUserPhone) { window.location.href = "auth.html"; return; }
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
             const user = snapshot.val();
             if(user) {
@@ -165,17 +161,18 @@
         });
     };
 
-    // सेयर फङ्सन - तपाईँको लिङ्क यहाँ छ
+    // सेयर फङ्सन - डबल लिङ्क हटाइएको र सन्देश मिलाइएको
     function shareApp() {
         const refCode = document.getElementById('user-ref').innerText;
         const appLink = "https://www.appcreator24.com/app3984422-labdpz";
-        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र घरमै बसी पैसा कमाउनुहोस्! 💰\n\nमेरो रिफर कोड: ${refCode}\nएप डाउनलोड लिङ्क: ${appLink}`;
+        
+        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र घरमै बसी पैसा कमाउनुहोस्! 💸\n\nमेरो रिफर कोड: ${refCode}\nएप डाउनलोड लिङ्क: ${appLink}`;
 
         if (navigator.share) {
             navigator.share({
                 title: 'Daily Paisa',
-                text: shareText,
-                url: appLink
+                text: shareText
+                // यहाँ url: appLink हटाइएको छ ताकि डबल नहोस्
             }).catch((error) => console.log('Error sharing:', error));
         } else {
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
@@ -192,8 +189,8 @@
     function submitWithdraw() {
         const amt = parseFloat(document.getElementById('withdrawAmt').value);
         const id = document.getElementById('withdrawID').value;
-        if (!selectedMethodName || isNaN(amt) || amt < 50 || !id) { alert("विवरण सही भर्नुहोस्!"); return; }
-        if (amt > userBalance) { alert("ब्यालेन्स पर्याप्त छैन!"); return; }
+        if (!selectedMethodName || isNaN(amt) || amt < 50 || !id) { alert("सही विवरण भर्नुहोस्!"); return; }
+        if (amt > userBalance) { alert("पर्याप्त ब्यालेन्स छैन!"); return; }
 
         const withdrawData = {
             date: new Date().toLocaleDateString(),
@@ -212,7 +209,7 @@
 
     function loadHistory() {
         const body = document.getElementById('historyBody');
-        body.innerHTML = "लोडिङ...";
+        body.innerHTML = "लोड हुँदैछ...";
         db.ref('withdrawals/' + currentUserPhone).once('value', (snapshot) => {
             body.innerHTML = "";
             const data = snapshot.val();
@@ -233,10 +230,7 @@
     }
 
     function handleLogout() {
-        if(confirm("बाहिरिन चाहनुहुन्छ?")) { 
-            localStorage.removeItem("currentUser"); 
-            window.location.href = "auth.html"; 
-        }
+        if(confirm("बाहिरिन चाहनुहुन्छ?")) { localStorage.removeItem("currentUser"); window.location.href = "auth.html"; }
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'historyModal') loadHistory(); }
