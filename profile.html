@@ -6,15 +6,7 @@
     <title>User Profile - Daily Paisa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { 
-            margin: 0; 
-            background: #f0f2f5; 
-            font-family: 'Poppins', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            padding-bottom: 80px; 
-        }
-
+        body { margin: 0; background: #f0f2f5; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; padding-bottom: 80px; }
         .profile-container { width: 100%; max-width: 400px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
         .profile-header { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); height: 140px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
         .avatar-section { text-align: center; margin-top: -70px; }
@@ -23,31 +15,18 @@
         .upload-btn { position: absolute; bottom: 5px; right: 5px; background: #2575fc; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .user-info { margin-top: 10px; }
         .user-name { font-size: 22px; font-weight: bold; color: #333; margin: 0; }
-        
-        .refer-stats-container {
-            display: flex;
-            justify-content: space-around;
-            background: #ffffff;
-            margin: 20px 15px 5px;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
+        .refer-stats-container { display: flex; justify-content: space-around; background: #ffffff; margin: 20px 15px 5px; padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .stat-box { text-align: center; flex: 1; }
         .stat-box:first-child { border-right: 1px solid #eee; }
         .stat-value { display: block; font-size: 18px; font-weight: bold; color: #2575fc; }
         .stat-label { font-size: 11px; color: #777; font-weight: 500; text-transform: uppercase; }
-
         .referral-badge { display: inline-block; background: #eef2ff; color: #2575fc; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 10px; }
         .withdraw-section { padding: 15px 20px; }
         .withdraw-btn { width: 100%; background: linear-gradient(to right, #f2994a, #f2c94c); color: white; border: none; padding: 16px; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(242, 153, 74, 0.4); transition: 0.3s; }
-        
         .menu-list { padding: 0 20px 20px; }
         .menu-item { display: flex; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; color: #444; font-weight: 500; }
         .menu-item i { width: 35px; font-size: 18px; color: #2575fc; }
-        .share-btn { background: #2575fc; color: white; justify-content: center; margin-top: 10px; }
-        
+        .share-btn { background: #2575fc; color: white; justify-content: center; margin-top: 10px; font-weight: bold; }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal-content { background: white; padding: 25px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; }
         .payment-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
@@ -57,22 +36,7 @@
         .modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
         .done-btn { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .cancel-text { display: block; margin-top: 15px; color: #888; font-size: 14px; cursor: pointer; }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            z-index: 1000;
-        }
-
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 1000; }
         .nav-item { text-align: center; color: #888; cursor: pointer; flex: 1; transition: 0.3s; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
         .nav-item span { font-size: 11px; font-weight: bold; }
@@ -90,7 +54,7 @@
             <button class="upload-btn" onclick="document.getElementById('img-upload').click()"><i class="fa fa-camera"></i></button>
         </div>
         <div class="user-info">
-            <p class="user-name" id="display-name">Loading...</p>
+            <p class="user-name" id="display-name">लोड हुँदैछ...</p>
             <div class="referral-badge"><i class="fa fa-gift"></i> Referral ID: <span id="user-ref">----</span></div>
         </div>
     </div>
@@ -102,7 +66,7 @@
         </div>
         <div class="stat-box">
             <span class="stat-value">रु. <span id="refer-bal">0.00</span></span>
-            <span class="stat-label">Refer Balance</span>
+            <span class="stat-label">Total Balance</span>
         </div>
     </div>
 
@@ -112,7 +76,7 @@
 
     <div class="menu-list">
         <div class="menu-item" onclick="openModal('editNameModal')"><i class="fa fa-user-edit"></i> Edit Profile</div>
-        <div class="menu-item" onclick="openModal('historyModal')"><i class="fa fa-history"></i> Local History</div>
+        <div class="menu-item" onclick="openModal('historyModal')"><i class="fa fa-history"></i> Withdrawal History</div>
         <div class="menu-item" style="color: #eb3349;" onclick="handleLogout()">
             <i class="fa fa-sign-out-alt" style="color: #eb3349;"></i> Logout
         </div>
@@ -170,6 +134,7 @@
     const firebaseConfig = {
         apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
         authDomain: "watch-vidwo.firebaseapp.com",
+        databaseURL: "https://watch-vidwo-default-rtdb.firebaseio.com",
         projectId: "watch-vidwo",
         storageBucket: "watch-vidwo.firebasestorage.app",
         messagingSenderId: "241433573771",
@@ -180,32 +145,48 @@
     const db = firebase.database();
     const currentUserPhone = localStorage.getItem("currentUser");
 
+    let userBalance = 0;
+    let selectedMethodName = "";
+
     window.onload = function() {
         if(!currentUserPhone) {
             window.location.href = "auth.html";
             return;
         }
-        
+
+        // Real-time Database बाट डाटा तान्ने
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
             const user = snapshot.val();
             if(user) {
-                document.getElementById('display-name').innerText = user.name || "No Name";
+                document.getElementById('display-name').innerText = user.name || "प्रयोगकर्ता";
                 document.getElementById('user-ref').innerText = user.myReferCode || "----";
+                
+                userBalance = parseFloat(user.referBalance || 0);
+                document.getElementById('refer-bal').innerText = userBalance.toFixed(2);
+                
                 document.getElementById('total-refer').innerText = user.totalRefer || "0";
-                document.getElementById('refer-bal').innerText = (user.referBalance || 0).toFixed(2);
             }
         });
     };
 
-    function saveName() {
-        const newName = document.getElementById('newNameInput').value.trim();
-        if(newName !== "") {
-            db.ref('users/' + currentUserPhone).update({ name: newName })
-            .then(() => { alert("नाम परिवर्तन भयो!"); closeModal('editNameModal'); });
+    // सेयर फङ्सन (App Link सहित)
+    function shareApp() {
+        const refCode = document.getElementById('user-ref').innerText;
+        const appLink = "https://www.appcreator24.com/app3984422-labdpz";
+        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र घरमै बसी पैसा कमाउनुहोस्! 💸\n\nमेरो रिफर कोड: ${refCode}\nएप लिङ्क: ${appLink}`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: 'Daily Paisa',
+                text: shareText,
+                url: appLink
+            }).catch((error) => console.log('Error sharing:', error));
+        } else {
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            window.open(whatsappUrl, '_blank');
         }
     }
 
-    let selectedMethodName = "";
     function selectMethod(name, element) {
         selectedMethodName = name;
         document.querySelectorAll('.method-box').forEach(box => box.classList.remove('selected'));
@@ -213,10 +194,11 @@
     }
 
     function submitWithdraw() {
-        const amt = document.getElementById('withdrawAmt').value;
+        const amt = parseFloat(document.getElementById('withdrawAmt').value);
         const id = document.getElementById('withdrawID').value;
-        if (!selectedMethodName || amt < 50 || !id) { alert("सही विवरण भर्नुहोस्!"); return; }
-        
+        if (!selectedMethodName || isNaN(amt) || amt < 50 || !id) { alert("विवरण सही भर्नुहोस्!"); return; }
+        if (amt > userBalance) { alert("ब्यालेन्स पर्याप्त छैन!"); return; }
+
         const withdrawData = {
             date: new Date().toLocaleDateString(),
             amount: amt,
@@ -226,12 +208,18 @@
         };
 
         db.ref('withdrawals/' + currentUserPhone).push(withdrawData)
-        .then(() => { alert("अनुरोध सफल भयो!"); closeModal('withdrawModal'); });
+        .then(() => {
+            return db.ref('users/' + currentUserPhone).update({ referBalance: userBalance - amt });
+        })
+        .then(() => { 
+            alert("निकासी अनुरोध पठाइयो!"); 
+            closeModal('withdrawModal'); 
+        });
     }
 
     function loadHistory() {
         const body = document.getElementById('historyBody');
-        body.innerHTML = "loading...";
+        body.innerHTML = "लोडिङ...";
         db.ref('withdrawals/' + currentUserPhone).once('value', (snapshot) => {
             body.innerHTML = "";
             const data = snapshot.val();
@@ -243,24 +231,23 @@
         });
     }
 
-    function handleLogout() {
-        if(confirm("बाहिरिन चाहनुहुन्छ?")) { localStorage.removeItem("currentUser"); window.location.href = "auth.html"; }
+    function saveName() {
+        const newName = document.getElementById('newNameInput').value.trim();
+        if(newName) {
+            db.ref('users/' + currentUserPhone).update({ name: newName })
+            .then(() => { alert("नाम परिवर्तन भयो!"); closeModal('editNameModal'); });
+        }
     }
 
-    function shareApp() {
-        const refCode = document.getElementById('user-ref').innerText;
-        const shareText = `Daily Paisa एप डाउनलोड गर्नुहोस् र पैसा कमाउनुहोस्! मेरो रेफर कोड: ${refCode}`;
-        if (navigator.share) { navigator.share({ title: 'Daily Paisa', text: shareText, url: window.location.origin }); }
-        else { window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank'); }
+    function handleLogout() {
+        if(confirm("बाहिरिन चाहनुहुन्छ?")) { 
+            localStorage.removeItem("currentUser"); 
+            window.location.href = "auth.html"; 
+        }
     }
 
     function openModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'historyModal') loadHistory(); }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    
-    document.getElementById('img-upload').onchange = function() {
-        const [file] = this.files;
-        if (file) { document.getElementById('profile-pic').src = URL.createObjectURL(file); }
-    };
 </script>
 </body>
 </html>
