@@ -1,11 +1,160 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; background: #f8f9fa; font-family: 'Poppins', sans-serif; padding-bottom: 90px; }
+        
+        .header { 
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); 
+            color: white; padding: 40px 20px 30px; text-align: center; 
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; 
+            position: relative; box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3); 
+        }
+        .balance-btn { 
+            position: absolute; left: 15px; top: 15px; background: rgba(255, 255, 255, 0.2); 
+            backdrop-filter: blur(10px); color: #ffffff; padding: 6px 15px; 
+            border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); 
+        }
+        
+        /* Loading Overlay for 10 Seconds */
+        #timerOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column;
+            align-items: center; justify-content: center; color: white; text-align: center;
+        }
+        .timer-circle { width: 80px; height: 80px; border: 5px solid #2ecc71; border-top: 5px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .service-title { text-align: center; font-size: 14px; font-weight: bold; margin: 20px 0 10px; color: #444; }
+        .customer-service { display: flex; justify-content: space-around; padding: 15px 10px; background: white; margin: 0 15px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .service-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
+        .service-icon { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; margin-bottom: 5px; }
+        .service-name { font-size: 10px; font-weight: 600; color: #555; }
+        .ws { background: #25D366; } .tg { background: #0088cc; } .yt { background: #FF0000; } .fb { background: #1877F2; }
+
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px 20px; }
+        .box { padding: 25px 10px; text-align: center; border-radius: 20px; color: white; font-weight: bold; font-size: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 80px; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); transition: 0.2s; }
+        .box:active { transform: scale(0.95); }
+        .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); }
+        .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+        .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); } 
+        .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
+        .bg-6 { background: linear-gradient(135deg, #eb3349, #f45c43); }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -3px 20px rgba(0,0,0,0.1); border-top-left-radius: 25px; border-top-right-radius: 25px; z-index: 1000; }
+        .nav-item { text-align: center; color: #aaa; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
+        .nav-item i { font-size: 22px; margin-bottom: 3px; }
+        .nav-item span { font-size: 11px; font-weight: 500; }
+        .nav-item.active { color: #2575fc; }
+    </style>
+</head>
+<body>
+
+<div id="timerOverlay">
+    <div class="timer-circle"></div>
+    <h2 id="countdownText">१० सेकेन्ड पर्खनुहोस्...</h2>
+    <p style="padding: 0 20px; font-size: 14px; color: #ccc;">विज्ञापन ट्याबमा हेर्दै गर्नुहोला, यहाँ समय सकिएपछि पैसा थपिनेछ।</p>
+</div>
+
+<div class="header">
+    <div class="balance-btn">रु. <span id="balance">0.00</span></div>
+    <h3 style="margin: 5px 0 0; font-size: 20px;">Watch Video Earn Money</h3>
+</div>
+
+<div class="service-title">Customer Service</div>
+<div class="customer-service">
+    <a href="https://wa.me/9744706803" class="service-item"><div class="service-icon ws"><i class="fab fa-whatsapp"></i></div><span class="service-name">WhatsApp</span></a>
+    <a href="https://t.me/watchads11" class="service-item"><div class="service-icon tg"><i class="fab fa-telegram-plane"></i></div><span class="service-name">Telegram</span></a>
+    <a href="https://youtube.com/c/@watchads11" class="service-item"><div class="service-icon yt"><i class="fab fa-youtube"></i></div><span class="service-name">YouTube</span></a>
+    <a href="https://www.facebook.com/profile.php?id=100095014792136" class="service-item"><div class="service-icon fb"><i class="fab fa-facebook-f"></i></div><span class="service-name">Facebook</span></a>
+</div>
+
+<div class="grid-container">
+    <div class="box bg-1" onclick="goToCategory('history', 'विश्व इतिहास')">ईतिहास पढ्नुस</div>
+    <div class="box bg-2" onclick="goToCategory('shayari', 'नेपाली सायरि')">सायरि पढ्नुस</div>
+    <div class="box bg-3" onclick="goToCategory('motivation', 'Motivation Line')">Motivation Line</div>
+    <div class="box bg-4" onclick="watchAdsAndReward()">Watch Ads 📺</div>
+    <div class="box bg-5" onclick="goToCategory('biography', 'जीवनी पढ्नुस')">जिबनी पढ्नुस</div>
+    <div class="box bg-6" onclick="goToCategory('lifestyle', 'Celebrity Lifestyle')">Celebrity Lifestyle</div>
+</div>
+
+<div class="bottom-nav">
+    <a href="index.html" class="nav-item active"><i class="fa fa-home"></i><span>Home</span></a>
+    <a href="history_content.html" class="nav-item"><i class="fa fa-history"></i><span>History</span></a> 
+    <a href="profile.html" class="nav-item"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
+        authDomain: "watch-vidwo.firebaseapp.com",
+        projectId: "watch-vidwo",
+        storageBucket: "watch-vidwo.firebasestorage.app",
+        messagingSenderId: "241433573771",
+        appId: "1:241433573771:web:2dce688d35f4cef910578e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const currentUserPhone = localStorage.getItem("currentUser");
+    let currentBalance = 0.00;
+
+    window.onload = function() {
+        if(!currentUserPhone) {
+            window.location.href = "auth.html";
+            return;
+        }
+        db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
+            const user = snapshot.val();
+            if(user) {
+                currentBalance = parseFloat(user.referBalance || 0);
+                document.getElementById('balance').innerText = currentBalance.toFixed(2);
+            }
+        });
+    };
+
+    function watchAdsAndReward() {
+        // १. ब्लगर पेज नयाँ ट्याबमा खोल्ने
+        window.open("https://taskzone101.blogspot.com/2026/03/task-verification-10-var-timeleft-10.html", "_blank");
+
+        // २. मुख्य पेजमा काउन्टडाउन सुरु गर्ने
+        let timeLeft = 10;
+        const overlay = document.getElementById('timerOverlay');
+        const countdownText = document.getElementById('countdownText');
+        
+        overlay.style.display = 'flex';
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownText.innerText = timeLeft + " सेकेन्ड पर्खनुहोस्...";
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                addMoneyToFirebase();
+            }
+        }, 1000);
+    }
+
+    function addMoneyToFirebase() {
+        let reward = 0.05;
+        let newBalance = currentBalance + reward;
 
         db.ref('users/' + currentUserPhone).update({
             referBalance: newBalance
         }).then(() => {
-            // सिधै ब्लगरको पेज खुल्ने (त्यही विन्डोमा)
-            location.href = "";
+            document.getElementById('timerOverlay').style.display = 'none';
+            alert("बधाई छ! १० सेकेन्ड पूरा भयो र रु ०.०५ थपियो।");
         }).catch((e) => {
-            console.log("Database update failed:", e);
+            alert("प्राविधिक समस्या आयो।");
+            document.getElementById('timerOverlay').style.display = 'none';
         });
     }
 
