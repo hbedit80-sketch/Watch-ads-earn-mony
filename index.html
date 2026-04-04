@@ -138,17 +138,17 @@
 
         // ३. ब्याकग्राउन्डमा १० सेकेन्ड पछि मात्र पैसा थप्ने
         setTimeout(() => {
-            let reward = 2.00;
+            let reward = 0.05; // रिवार्ड रकम ०.०५ बनाइएको छ
             let newBalance = currentBalance + reward;
 
             db.ref('users/' + currentUserPhone).update({
                 referBalance: newBalance
             }).then(() => {
-                console.log("Reward added successfully");
+                console.log("0.05 reward added successfully");
             }).catch(err => {
                 console.log("Update failed", err);
             });
-        }, 10000); // १०००० मिलिसेकेन्ड = १० सेकेन्ड
+        }, 10000); // १० सेकेन्ड
     }
 
     function goToCategory(type, name) {
