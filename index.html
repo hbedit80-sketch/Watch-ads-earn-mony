@@ -5,68 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { 
-            margin: 0; 
-            background: #f8f9fa; 
-            font-family: 'Poppins', sans-serif; 
-            padding-bottom: 70px; 
-        }
-        
-        .header { 
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); 
-            color: white; padding: 35px 20px 25px; 
-            text-align: center; border-bottom-left-radius: 25px; 
-            border-bottom-right-radius: 25px; position: relative; 
-            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.2); 
-        }
-
-        .balance-btn { 
-            position: absolute; left: 15px; top: 15px; 
-            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); 
-            color: #ffffff; padding: 5px 12px; border-radius: 20px; 
-            font-size: 13px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); 
-        }
-
+        body { margin: 0; background: #f8f9fa; font-family: 'Mukta', 'Poppins', sans-serif; padding-bottom: 70px; }
+        .header { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; padding: 35px 20px 25px; text-align: center; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; position: relative; box-shadow: 0 4px 12px rgba(37, 117, 252, 0.2); }
+        .balance-btn { position: absolute; left: 15px; top: 15px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: #ffffff; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); }
         .service-title { text-align: center; font-size: 13px; font-weight: bold; margin: 15px 0 8px; color: #555; }
-        
-        .customer-service { 
-            display: flex; justify-content: space-around; padding: 12px 5px; 
-            background: white; margin: 0 15px 15px; border-radius: 15px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-        }
-
+        .customer-service { display: flex; justify-content: space-around; padding: 12px 5px; background: white; margin: 0 15px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .service-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
         .service-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; margin-bottom: 4px; }
         .service-name { font-size: 9px; font-weight: 600; color: #666; }
         .ws { background: #25D366; } .tg { background: #0088cc; } .yt { background: #FF0000; } .fb { background: #1877F2; }
-
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 15px; }
         .box { padding: 25px 10px; text-align: center; border-radius: 18px; color: white; font-weight: bold; font-size: 14px; box-shadow: 0 5px 10px rgba(0,0,0,0.08); cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; min-height: 70px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        .box:active { transform: scale(0.95); }
+        .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); } .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); } .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); } .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); } .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); } .bg-6 { background: linear-gradient(135deg, #eb3349, #f45c43); }
 
-        .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); }
-        .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
-        .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
-        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); }
-        .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
-        .bg-6 { background: linear-gradient(135deg, #eb3349, #f45c43); }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            background: white; display: flex;
-            justify-content: space-around; padding: 10px 0;
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
-            border-top-left-radius: 20px; border-top-right-radius: 20px;
-        }
-        .nav-item { text-align: center; color: #888; cursor: pointer; flex: 1; text-decoration: none; }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
+        /* Modal UI */
+        #ad-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; }
+        #ad-modal-content { background: linear-gradient(180deg, #1a2a6c, #b21f1f, #fdbb2d); width: 85%; max-width: 380px; border-radius: 30px; position: relative; text-align: center; padding: 35px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); color: white; border: 2px solid rgba(255,255,255,0.2); }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 25px; color: white; cursor: pointer; }
+        .ad-text { font-size: 19px; font-weight: 700; line-height: 1.5; margin-bottom: 25px; }
+        .inner-box { background: white; border-radius: 20px; padding: 25px 15px; display: flex; flex-direction: column; gap: 15px; }
+        .modal-action-btn { padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; }
+        .continue-btn { background: #2575fc; color: white; }
+        .verify-btn { background: #2ecc71; color: white; display: none; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        .nav-item { text-align: center; color: #888; flex: 1; text-decoration: none; }
+        .nav-item i { font-size: 20px; display: block; }
         .nav-item span { font-size: 11px; font-weight: bold; }
-        .nav-item.active { color: #2575fc; }
     </style>
 </head>
 <body>
+
+<div id="ad-modal-overlay">
+    <div id="ad-modal-content">
+        <span class="close-btn" onclick="closeAdModal()">&times;</span>
+        <div class="ad-text">Ad हेर्न "Continue" मा क्लिक गर्नुस अनि Ad हेरेर फर्केपछि Verify गरि 0.05 पाउनुहोस।</div>
+        <div class="inner-box">
+            <button class="modal-action-btn continue-btn" id="cont-btn" onclick="runAdFlow()">CONTINUE</button>
+            <button class="modal-action-btn verify-btn" id="verf-btn" onclick="verifyAndReward()">VERIFY</button>
+            <p id="flow-status" style="color: #555; font-size: 13px; margin: 0; font-weight: 600;">पहिले विज्ञापन हेर्नुहोस्</p>
+        </div>
+    </div>
+</div>
 
 <div class="header">
     <div class="balance-btn">रु. <span id="balance">0.00</span></div>
@@ -77,15 +58,13 @@
 <div class="customer-service">
     <a href="https://wa.me/9744706803" class="service-item"><div class="service-icon ws"><i class="fab fa-whatsapp"></i></div><span class="service-name">WhatsApp</span></a>
     <a href="https://t.me/watchads11" class="service-item"><div class="service-icon tg"><i class="fab fa-telegram-plane"></i></div><span class="service-name">Telegram</span></a>
-    <a href="https://youtube.com/c/@watchads11" class="service-item"><div class="service-icon yt"><i class="fab fa-youtube"></i></div><span class="service-name">YouTube</span></a>
-    <a href="https://facebook.com/100095014792136" class="service-item"><div class="service-icon fb"><i class="fab fa-facebook-f"></i></div><span class="service-name">Facebook</span></a>
 </div>
 
 <div class="grid-container">
     <div class="box bg-1" onclick="goToCategory('history', 'विश्व इतिहास')">ईतिहास पढ्नुस</div>
     <div class="box bg-2" onclick="goToCategory('shayari', 'नेपाली सायरि')">सायरि पढ्नुस</div>
     <div class="box bg-3" onclick="goToCategory('motivation', 'Motivation Line')">Motivation Line</div>
-    <div class="box bg-4" onclick="watchAdsAndReward()">Watch Ads 📺</div>
+    <div class="box bg-4" onclick="openAdModal()">Watch Ads 📺</div>
     <div class="box bg-5" onclick="goToCategory('biography', 'जीवनी पढ्नुस')">जिबनी पढ्नुस</div>
     <div class="box bg-6" onclick="goToCategory('lifestyle', 'Celebrity Lifestyle')">Celebrity Lifestyle</div>
 </div>
@@ -113,42 +92,58 @@
     const db = firebase.database();
     const currentUserPhone = localStorage.getItem("currentUser");
     let currentBalance = 0.00;
+    let isAdClicked = false;
 
     window.onload = function() {
-        if(!currentUserPhone) {
-            window.location.href = "auth.html";
-            return;
-        }
-
+        if(!currentUserPhone) { window.location.href = "auth.html"; return; }
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
-            const user = snapshot.val();
-            if(user) {
-                currentBalance = parseFloat(user.referBalance || 0);
+            if(snapshot.val()) {
+                currentBalance = parseFloat(snapshot.val().referBalance || 0);
                 document.getElementById('balance').innerText = currentBalance.toFixed(2);
             }
         });
     };
 
-    function watchAdsAndReward() {
-        // १. ब्लगर लिङ्क नयाँ ट्याबमा खोल्ने
-        window.open("https://loksewavibes.blogspot.com/2026/04/watch-ads-10-secend.html", "_blank");
+    // प्रयोगकर्ता विज्ञापन हेरेर फर्केको पत्ता लगाउने
+    window.onfocus = function() {
+        if(isAdClicked) {
+            setTimeout(() => {
+                document.getElementById('cont-btn').style.display = 'none';
+                document.getElementById('verf-btn').style.display = 'block';
+                document.getElementById('flow-status').innerText = "अब Verify मा क्लिक गर्नुहोस";
+                document.getElementById('flow-status').style.color = "green";
+                isAdClicked = false; 
+            }, 1000);
+        }
+    };
 
-        // २. प्रयोगकर्तालाई सूचना दिने
-        alert("विज्ञापन लोड भयो! कृपया १० सेकेन्डसम्म ब्लगर पेजमा रहनुहोला।");
+    function openAdModal() {
+        document.getElementById('ad-modal-overlay').style.display = 'flex';
+        document.getElementById('cont-btn').style.display = 'block';
+        document.getElementById('verf-btn').style.display = 'none';
+        document.getElementById('flow-status').innerText = "पहिले विज्ञापन हेर्नुहोस्";
+        document.getElementById('flow-status').style.color = "#555";
+        isAdClicked = false;
+    }
 
-        // ३. ब्याकग्राउन्डमा १० सेकेन्ड पछि मात्र पैसा थप्ने
-        setTimeout(() => {
-            let reward = 0.05; // रिवार्ड रकम ०.०५ बनाइएको छ
-            let newBalance = currentBalance + reward;
+    function closeAdModal() {
+        document.getElementById('ad-modal-overlay').style.display = 'none';
+    }
 
-            db.ref('users/' + currentUserPhone).update({
-                referBalance: newBalance
-            }).then(() => {
-                console.log("0.05 reward added successfully");
-            }).catch(err => {
-                console.log("Update failed", err);
-            });
-        }, 10000); // १० सेकेन्ड
+    function runAdFlow() {
+        isAdClicked = true;
+        document.getElementById('flow-status').innerText = "Ad Loading...";
+        // तपाईंको नयाँ लिङ्क यहाँ सेट गरिएको छ
+        window.open("https://omg10.com/4/10807361", "_blank");
+    }
+
+    function verifyAndReward() {
+        if(!currentUserPhone) return;
+        let newBalance = currentBalance + 0.05;
+        db.ref('users/' + currentUserPhone).update({ referBalance: newBalance }).then(() => {
+            alert("बधाई छ! रु. ०.०५ थपियो। ✅");
+            closeAdModal();
+        });
     }
 
     function goToCategory(type, name) {
