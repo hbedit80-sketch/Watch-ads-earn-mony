@@ -96,6 +96,12 @@
 
     window.onload = function() {
         if(!currentUserPhone) { window.location.href = "auth.html"; return; }
+        
+        // चेक गर्ने: के अघिल्लो पटक विज्ञापन क्लिक भएको थियो?
+        if(localStorage.getItem("pendingVerify") === "true") {
+            showVerifyButton();
+        }
+
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
             if(snapshot.val()) {
                 currentBalance = parseFloat(snapshot.val().referBalance || 0);
@@ -104,20 +110,31 @@
         });
     };
 
-    // प्रयोगकर्ता विज्ञापन हेरेर फर्केको पत्ता लगाउने
     window.onfocus = function() {
         if(isAdClicked) {
             setTimeout(() => {
-                document.getElementById('cont-btn').style.display = 'none';
-                document.getElementById('verf-btn').style.display = 'block';
-                document.getElementById('flow-status').innerText = "अब Verify मा क्लिक गर्नुहोस";
-                document.getElementById('flow-status').style.color = "green";
+                showVerifyButton();
                 isAdClicked = false; 
             }, 1000);
         }
     };
 
+    function showVerifyButton() {
+        document.getElementById('ad-modal-overlay').style.display = 'flex';
+        document.getElementById('cont-btn').style.display = 'none';
+        document.getElementById('verf-btn').style.display = 'block';
+        document.getElementById('flow-status').innerText = "अब Verify मा क्लिक गर्नुहोस";
+        document.getElementById('flow-status').style.color = "green";
+        // Verify बाँकी छ भनेर सेभ गर्ने
+        localStorage.setItem("pendingVerify", "true");
+    }
+
     function openAdModal() {
+        // यदि पहिले नै Verify गर्न बाँकी छ भने सिधै त्यही देखाउने
+        if(localStorage.getItem("pendingVerify") === "true") {
+            showVerifyButton();
+            return;
+        }
         document.getElementById('ad-modal-overlay').style.display = 'flex';
         document.getElementById('cont-btn').style.display = 'block';
         document.getElementById('verf-btn').style.display = 'none';
@@ -127,13 +144,15 @@
     }
 
     function closeAdModal() {
+        // यदि विज्ञापन क्लिक भइसकेको छ तर भेरिफाई भएको छैन भने बन्द गर्न नदिने (Optional)
+        // यदि बन्द गर्न दिने हो भने तलको कोड राख्नुस्
         document.getElementById('ad-modal-overlay').style.display = 'none';
     }
 
     function runAdFlow() {
         isAdClicked = true;
         document.getElementById('flow-status').innerText = "Ad Loading...";
-        // तपाईंको नयाँ लिङ्क यहाँ सेट गरिएको छ
+        localStorage.setItem("pendingVerify", "true"); // क्लिक हुने बित्तिकै सेट गर्ने
         window.open("https://omg10.com/4/10807361", "_blank");
     }
 
@@ -142,6 +161,7 @@
         let newBalance = currentBalance + 0.05;
         db.ref('users/' + currentUserPhone).update({ referBalance: newBalance }).then(() => {
             alert("बधाई छ! रु. ०.०५ थपियो। ✅");
+            localStorage.removeItem("pendingVerify"); // सफलतापुर्वक रिवार्ड पाएपछि हटाउने
             closeAdModal();
         });
     }
