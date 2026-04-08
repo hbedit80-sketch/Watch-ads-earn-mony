@@ -143,62 +143,18 @@
         });
     };
 
-    // विज्ञापन हेरेर रिवार्ड दिने मुख्य फङ्सन
+    // सिधै विज्ञापन खोल्ने र पैसा थप्ने फङ्सन
     function watchAdsAndReward() {
         const adUrl = "https://omg10.com/4/10807361";
         
-        // १. पहिले विज्ञापन खोल्ने अनुमति माग्ने
-        Swal.fire({
-            title: 'विज्ञापन लोड भयो!',
-            text: "विज्ञापन हेर्न 'Watch Now' थिच्नुहोस्। १० सेकेन्ड हेरेर फर्किएपछि मात्र पैसा थपिनेछ।",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonColor: '#2575fc',
-            confirmButtonText: 'Watch Now 📺',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // विज्ञापन खोल्ने
-                window.open(adUrl, "_blank");
+        // १. सिधै विज्ञापन खोल्ने
+        window.open(adUrl, "_blank");
 
-                // २. विज्ञापन खोलेपछि एउटा अर्को बक्स देखाउने जसमा १० सेकेन्ड पछि मात्र बटन आउँछ
-                let timerInterval;
-                Swal.fire({
-                    title: 'भेरिफाई हुँदैछ...',
-                    html: 'कृपया <b></b> सेकेन्डसम्म विज्ञापन हेर्नुहोस्।',
-                    timer: 10000, // १० सेकेन्ड
-                    timerProgressBar: true,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        const b = Swal.getHtmlContainer().querySelector('b');
-                        timerInterval = setInterval(() => {
-                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                        }, 100);
-                    },
-                    willClose: () => {
-                        clearInterval(timerInterval);
-                    }
-                }).then((res) => {
-                    // १० सेकेन्ड सकिएपछि युजरलाई पैसा थप्ने बटन देखाउने
-                    Swal.fire({
-                        title: 'भेरिफिकेशन सफल!',
-                        text: 'रु ०.०५ प्राप्त गर्न तलको बटन थिच्नुहोस्।',
-                        icon: 'success',
-                        confirmButtonText: 'Collect Reward 💰',
-                        confirmButtonColor: '#28a745',
-                        allowOutsideClick: false
-                    }).then((rewardRes) => {
-                        if (rewardRes.isConfirmed) {
-                            addMoneyToFirebase();
-                        }
-                    });
-                });
-            }
-        });
+        // २. विज्ञापन खोले लगत्तै ब्यालेन्स अपडेट गर्ने
+        addMoneyToFirebase();
     }
 
-    // पैसा थप्ने फङ्सन
+    // पैसा थप्ने मुख्य फङ्सन
     function addMoneyToFirebase() {
         let reward = 0.05;
         let newBalance = currentBalance + reward;
@@ -206,13 +162,18 @@
         db.ref('users/' + currentUserPhone).update({
             referBalance: newBalance
         }).then(() => {
+            // ३. ब्यालेन्स अपडेट भएपछि एउटा राम्रो मेसेज देखाउने
             Swal.fire({
-                title: 'सफल भयो!',
-                text: 'रु ०.०५ तपाईँको खातामा थपियो। ✅',
+                title: 'ब्यालेन्स अपडेट भयो!',
+                text: 'रु ०.०५ तपाईँको खातामा थपिएको छ। ✅',
                 icon: 'success',
-                timer: 2000
+                timer: 2500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
             });
         }).catch(err => {
+            console.error("Error:", err);
             Swal.fire('त्रुटि!', 'ब्यालेन्स अपडेट हुन सकेन।', 'error');
         });
     }
