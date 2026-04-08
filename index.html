@@ -3,120 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>User Dashboard - Daily Paisa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;600;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { margin: 0; background: #f8f9fa; font-family: 'Mukta', 'Poppins', sans-serif; padding-bottom: 80px; }
-        .header { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; padding: 35px 20px 25px; text-align: center; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; position: relative; box-shadow: 0 4px 12px rgba(37, 117, 252, 0.2); }
-        .balance-btn { position: absolute; left: 15px; top: 15px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: #ffffff; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); }
+        body { margin: 0; background: #f8f9fa; font-family: 'Poppins', sans-serif; padding-bottom: 70px; }
         
+        .premium-notice {
+            background: linear-gradient(90deg, #ff8c00, #ff0080);
+            color: white; padding: 12px 15px; margin: 10px 15px;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 0, 128, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2); overflow: hidden;
+        }
+        .notice-flex { display: flex; align-items: center; gap: 12px; }
+        .notice-icon { background: rgba(255, 255, 255, 0.2); padding: 5px 10px; border-radius: 8px; font-size: 18px; animation: flash 1s infinite alternate; }
+        .notice-text-box { flex: 1; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        @keyframes flash { from { opacity: 1; transform: scale(1); } to { opacity: 0.7; transform: scale(1.1); } }
+
+        .header { 
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); 
+            color: white; padding: 35px 20px 25px; 
+            text-align: center; border-bottom-left-radius: 25px; 
+            border-bottom-right-radius: 25px; position: relative; 
+            box-shadow: 0 4px 12px rgba(37, 117, 252, 0.2); 
+        }
+        .balance-btn { 
+            position: absolute; left: 15px; top: 15px; 
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); 
+            color: #ffffff; padding: 5px 12px; border-radius: 20px; 
+            font-size: 13px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.3); 
+        }
+        .service-title { text-align: center; font-size: 13px; font-weight: bold; margin: 15px 0 8px; color: #555; }
+        .customer-service { display: flex; justify-content: space-around; padding: 12px 5px; background: white; margin: 0 15px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .service-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
+        .service-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; margin-bottom: 4px; }
+        .service-name { font-size: 9px; font-weight: 600; color: #666; }
+        .ws { background: #25D366; } .tg { background: #0088cc; } .yt { background: #FF0000; } .fb { background: #1877F2; }
+
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 15px; }
-        .box { padding: 25px 10px; text-align: center; border-radius: 18px; color: white; font-weight: bold; font-size: 14px; box-shadow: 0 5px 10px rgba(0,0,0,0.08); cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; min-height: 70px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
-        
-        /* नयाँ अझै आकर्षक प्रिमियम बाकस (Ultra Premium Ad Box) */
-        .bg-ad-premium { 
-            background: linear-gradient(45deg, #FF00CC, #333399); 
-            grid-column: span 2; 
-            animation: pulse 1.5s infinite;
-            border: 2px solid gold;
-            font-size: 17px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 15px rgba(255, 0, 204, 0.4);
-        }
+        .box { padding: 25px 10px; text-align: center; border-radius: 18px; color: white; font-weight: bold; font-size: 14px; box-shadow: 0 5px 10px rgba(0,0,0,0.08); cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; min-height: 70px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .box:active { transform: scale(0.95); }
 
-        /* चम्किने इफेक्ट (Shine Effect) */
-        .bg-ad-premium::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(45deg);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 100%; }
-            100% { left: 100%; }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
-            100% { transform: scale(1); }
-        }
-
-        .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); } 
-        .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); } 
-        .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); } 
-        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); } 
-        .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); } 
+        .bg-1 { background: linear-gradient(135deg, #FF5F6D, #FFC371); }
+        .bg-2 { background: linear-gradient(135deg, #2193b0, #6dd5ed); }
+        .bg-3 { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .bg-4 { background: linear-gradient(135deg, #F2994A, #F2C94C); }
+        .bg-5 { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
         .bg-6 { background: linear-gradient(135deg, #eb3349, #f45c43); }
 
-        /* Modal UI */
-        #ad-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 2000; justify-content: center; align-items: center; }
-        #ad-modal-content { background: linear-gradient(180deg, #1a2a6c, #b21f1f, #fdbb2d); width: 85%; max-width: 380px; border-radius: 30px; position: relative; text-align: center; padding: 35px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); color: white; border: 2px solid rgba(255,255,255,0.2); }
-        .inner-box { background: white; border-radius: 20px; padding: 25px 15px; display: flex; flex-direction: column; gap: 15px; }
-        .modal-action-btn { padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; }
-        .continue-btn { background: #2575fc; color: white; }
-        .verify-btn { background: #2ecc71; color: white; display: none; }
-        
-        .customer-service { display: flex; justify-content: space-around; padding: 12px 5px; background: white; margin: 0 15px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .service-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
-        .service-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
-        .ws { background: #25D366; } .tg { background: #0088cc; } .yt { background: #FF0000; } .fb { background: #1877F2; }
-        
-        /* Bottom Nav Fix */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; z-index: 1000; }
-        .nav-item { text-align: center; color: #888; flex: 1; text-decoration: none; cursor: pointer; }
-        .nav-item i { font-size: 20px; display: block; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 15px rgba(0,0,0,0.1); border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        .nav-item { text-align: center; color: #888; cursor: pointer; flex: 1; text-decoration: none; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 2px; }
         .nav-item span { font-size: 11px; font-weight: bold; }
-        .nav-item.active { color: #6a11cb; }
+        .nav-item.active { color: #2575fc; }
     </style>
 </head>
 <body>
 
-<div id="ad-modal-overlay">
-    <div id="ad-modal-content">
-        <span style="position: absolute; top: 15px; right: 20px; font-size: 25px; cursor: pointer;" onclick="closeAdModal()">&times;</span>
-        <div style="font-size: 18px; font-weight: bold; margin-bottom: 20px;">Ad हेरेर पैसा कमाउनुहोस्!</div>
-        <div class="inner-box">
-            <button class="modal-action-btn continue-btn" id="cont-btn" onclick="runAdFlow()">CONTINUE (Ad हेर्नुहोस्)</button>
-            <button class="modal-action-btn verify-btn" id="verf-btn" onclick="verifyAndReward()">VERIFY (पैसा लिनुहोस्)</button>
-            <p id="flow-status" style="color: #666; font-size: 13px; font-weight: 600;">पहिले विज्ञापन पूरा हेर्नुहोस्</p>
+<div class="header">
+    <div class="balance-btn">रु. <span id="balance">0.00</span></div>
+    <h3 style="margin: 5px 0 0; font-size: 18px;">Daily Paisa</h3>
+</div>
+
+<div id="notice-bar" class="premium-notice" style="display: none;">
+    <div class="notice-flex">
+        <div class="notice-icon">📢</div>
+        <div class="notice-text-box">
+            <marquee id="notice-text" behavior="scroll" direction="left" scrollamount="5">जानकारी लोड हुँदैछ...</marquee>
         </div>
     </div>
 </div>
 
-<div class="header">
-    <div class="balance-btn">रु. <span id="balance">0.00</span></div>
-    <h3>Daily Paisa</h3>
-</div>
-
-<div style="text-align: center; font-size: 13px; font-weight: bold; margin: 15px 0 8px;">Customer Service</div>
+<div class="service-title">Customer Service</div>
 <div class="customer-service">
-    <a href="https://whatsapp.com/channel/0029VbBv3sa4CrfhgIAwGG3c" class="service-item"><div class="service-icon ws"><i class="fab fa-whatsapp"></i></div></a>
-    <a href="https://youtube.com/c/@watchads11" class="service-item"><div class="service-icon yt"><i class="fab fa-youtube"></i></div></a>
-    <a href="https://facebook.com/100095014792136" class="service-item"><div class="service-icon fb"><i class="fab fa-facebook-f"></i></div></a>
-    <a href="https://t.me/watchads11" class="service-item"><div class="service-icon tg"><i class="fab fa-telegram-plane"></i></div></a>
+    <a href="https://wa.me/9800000000" class="service-item"><div class="service-icon ws"><i class="fab fa-whatsapp"></i></div><span class="service-name">WhatsApp</span></a>
+    <a href="https://t.me/yourusername" class="service-item"><div class="service-icon tg"><i class="fab fa-telegram-plane"></i></div><span class="service-name">Telegram</span></a>
+    <a href="https://youtube.com/c/yourchannel" class="service-item"><div class="service-icon yt"><i class="fab fa-youtube"></i></div><span class="service-name">YouTube</span></a>
+    <a href="https://facebook.com/yourpage" class="service-item"><div class="service-icon fb"><i class="fab fa-facebook-f"></i></div><span class="service-name">Facebook</span></a>
 </div>
 
 <div class="grid-container">
-    <div class="box bg-1" onclick="goToCategory('history', 'इतिहास')">इतिहास</div>
-    <div class="box bg-2" onclick="goToCategory('shayari', 'सायरि')">सायरि</div>
-    <div class="box bg-3" onclick="goToCategory('motivation', 'Motivation')">Motivation</div>
-    <div class="box bg-4" onclick="openAdModal()">Watch Ads 📺</div>
-    
-    <div class="box bg-ad-premium" onclick="openAdModal()">
-        <i class="fas fa-gift" style="margin-right: 8px;"></i> Claim 0.05 Bonus 🎁
-    </div>
-    
-    <div class="box bg-5" onclick="goToCategory('biography', 'जीवनी')">जीवनी</div>
-    <div class="box bg-6" onclick="goToCategory('lifestyle', 'Lifestyle')">Lifestyle</div>
+    <div class="box bg-1" onclick="goToCategory('history', 'विश्व इतिहास')">ईतिहास पढ्नुस</div>
+    <div class="box bg-2" onclick="goToCategory('shayari', 'नेपाली सायरि')">सायरि पढ्नुस</div>
+    <div class="box bg-3" onclick="goToCategory('motivation', 'Motivation Line')">Motivation Line</div>
+    <div class="box bg-4" onclick="watchAdsAndReward()">Watch Ads 📺</div>
+    <div class="box bg-5" onclick="goToCategory('biography', 'जीवनी पढ्नुस')">जिबनी पढ्नुस</div>
+    <div class="box bg-6" onclick="goToCategory('lifestyle', 'Celebrity Lifestyle')">Celebrity Lifestyle</div>
 </div>
 
 <div class="bottom-nav">
@@ -132,6 +104,7 @@
     const firebaseConfig = {
         apiKey: "AIzaSyDJg13_ijiXoMs-WZEqLjl0TVO8QBp3eEc",
         authDomain: "watch-vidwo.firebaseapp.com",
+        databaseURL: "https://watch-vidwo-default-rtdb.firebaseio.com",
         projectId: "watch-vidwo",
         storageBucket: "watch-vidwo.firebasestorage.app",
         messagingSenderId: "241433573771",
@@ -144,59 +117,83 @@
     let currentBalance = 0.00;
 
     window.onload = function() {
-        if(!currentUserPhone) { window.location.href = "auth.html"; return; }
-        if(localStorage.getItem("pendingVerify") === "true") { showVerifyButton(); }
+        if(!currentUserPhone) {
+            window.location.href = "auth.html";
+            return;
+        }
 
         db.ref('users/' + currentUserPhone).on('value', (snapshot) => {
-            if(snapshot.val()) {
-                currentBalance = parseFloat(snapshot.val().referBalance || 0);
+            const user = snapshot.val();
+            if(user) {
+                currentBalance = parseFloat(user.referBalance || 0);
                 document.getElementById('balance').innerText = currentBalance.toFixed(2);
+            }
+        });
+
+        db.ref('appSettings/notice').on('value', (snapshot) => {
+            const notice = snapshot.val();
+            const noticeBar = document.getElementById('notice-bar');
+            const noticeText = document.getElementById('notice-text');
+            if (notice && notice !== "") {
+                noticeText.innerText = notice;
+                noticeBar.style.display = 'block';
+            } else {
+                noticeBar.style.display = 'none';
             }
         });
     };
 
-    window.onfocus = function() {
-        if(localStorage.getItem("pendingVerify") === "true") { showVerifyButton(); }
-    };
+    // विज्ञापन हेरेर रिवार्ड दिने सच्याइएको फङ्सन (SweetAlert2 प्रयोग गरिएको)
+    function watchAdsAndReward() {
+        const adUrl = "https://omg10.com/4/10807361";
+        
+        Swal.fire({
+            title: 'विज्ञापन लोड भयो!',
+            text: "कृपया कम्तिमा १० सेकेन्ड विज्ञापन हेर्नुहोस्। त्यसपछि यहाँ फर्किएर 'OK' थिच्नुहोस्।",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#2575fc',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK',
+            cancelButtonText: 'CANCEL'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // विज्ञापन नयाँ विन्डोमा खोल्ने
+                window.open(adUrl, "_blank");
 
-    function openAdModal() {
-        document.getElementById('ad-modal-overlay').style.display = 'flex';
-        if(localStorage.getItem("pendingVerify") === "true") {
-            showVerifyButton();
-        } else {
-            document.getElementById('cont-btn').style.display = 'block';
-            document.getElementById('verf-btn').style.display = 'none';
-            document.getElementById('flow-status').innerText = "पहिले विज्ञापन पूरा हेर्नुहोस्";
-            document.getElementById('flow-status').style.color = "#666";
-        }
-    }
+                // १० सेकेन्डको वेटिङ मेसेज (localhost नलेखिएको)
+                Swal.fire({
+                    title: 'भेरिफाई हुँदैछ...',
+                    text: 'कृपया १० सेकेन्ड कुर्नुहोस्, त्यसपछि तपाईँको ब्यालेन्स अपडेट हुनेछ।',
+                    timer: 10000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                }).then(() => {
+                    // १० सेकेन्ड पछि पैसा थप्ने
+                    let reward = 0.05;
+                    let newBalance = currentBalance + reward;
 
-    function runAdFlow() {
-        localStorage.setItem("pendingVerify", "true");
-        document.getElementById('flow-status').innerText = "Ad Loading...";
-        window.location.href = "get_interstitial";
-    }
-
-    function showVerifyButton() {
-        document.getElementById('cont-btn').style.display = 'none';
-        document.getElementById('verf-btn').style.display = 'block';
-        document.getElementById('flow-status').innerText = "अब पैसा दाबी गर्न VERIFY थिच्नुहोस्!";
-        document.getElementById('flow-status').style.color = "green";
-    }
-
-    function verifyAndReward() {
-        if(!currentUserPhone) return;
-        let newBalance = currentBalance + 0.05;
-        db.ref('users/' + currentUserPhone).update({ referBalance: newBalance }).then(() => {
-            alert("बधाई छ! रु. ०.०५ थपियो। ✅");
-            localStorage.removeItem("pendingVerify");
-            document.getElementById('ad-modal-overlay').style.display = 'none';
+                    db.ref('users/' + currentUserPhone).update({
+                        referBalance: newBalance
+                    }).then(() => {
+                        Swal.fire({
+                            title: 'सफल भयो!',
+                            text: 'रु ०.०५ तपाईँको खातामा थपियो। ✅',
+                            icon: 'success'
+                        });
+                    }).catch(err => {
+                        Swal.fire('त्रुटि!', 'ब्यालेन्स अपडेट हुन सकेन।', 'error');
+                    });
+                });
+            }
         });
     }
 
-    function closeAdModal() { document.getElementById('ad-modal-overlay').style.display = 'none'; }
-    function goToCategory(type, name) { location.href = `content.html?type=${type}&name=${encodeURIComponent(name)}`; }
+    function goToCategory(type, name) {
+        location.href = `content.html?type=${type}&name=${encodeURIComponent(name)}`;
+    }
 </script>
-
 </body>
 </html>
